@@ -55,8 +55,8 @@
 <SvelteToast />
 <main class="w-full min-h-screen flex flex-col items-center bg-base100">
 	<section class="h-[32px] w-full bg-neutral flex justify-center items-center">
-		<nav class="w-full max-w-lg px-2">
-			<a href="/" class="font-exo">Idle Space Mining</a>
+		<nav class="w-full max-w-lg px-2 justify-center items-center">
+			<a href="/" class="font-exo-title">Idle Space Mining</a>
 		</nav>
 	</section>
 	<MoneyCard />
