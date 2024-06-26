@@ -1,53 +1,70 @@
 <script>
-	import Header from './Header.svelte';
-	import './styles.css';
+	import { SvelteToast, toast } from '@zerodevx/svelte-toast';
+	import MoneyCard from '../components/MoneyCard.svelte';
+	import { incrementAmount, money, ships, planet } from '../stores/gameLogic';
+	import {
+		calculateOfflineMoney,
+		loadFromLocalStorage,
+		saveToLocalStorage,
+	} from '../utils/saving';
+	import { onMount } from 'svelte';
+	import { abbreviateNumber } from '../utils/stringFormatter';
+
+	import '../app.css';
+
+	onMount(() => {
+		const loadData = loadFromLocalStorage(window);
+
+		if (loadData) {
+			const offlineMoney = calculateOfflineMoney(
+				loadData.date,
+				loadData.incrementAmount
+			);
+
+			$planet = loadData.planet;
+			$incrementAmount = loadData.incrementAmount;
+			$money = loadData.money + offlineMoney;
+			$ships = loadData.ships;
+
+			toast.push(
+				`Welcome back! You receive $${abbreviateNumber(offlineMoney)}`
+			);
+		}
+
+		setInterval(() => {
+			const date = Math.floor(Date.now() / 1000);
+			saveToLocalStorage(window, {
+				planet: $planet,
+				incrementAmount: $incrementAmount,
+				money: $money,
+				ships: $ships,
+				date: date,
+			});
+		}, 5000);
+	});
 </script>
 
-<div class="app">
-	<Header />
+<svelte:head>
+	<title>Idle Space Mining</title>
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+	<link rel="manifest" href="/site.webmanifest" />
+</svelte:head>
 
-	<main>
+<SvelteToast />
+<main class="w-full min-h-screen flex flex-col items-center bg-base100">
+	<section class="h-[32px] w-full bg-neutral flex justify-center items-center">
+		<nav class="w-full max-w-lg px-2">
+			<a href="/" class="font-exo">Idle Space Mining</a>
+		</nav>
+	</section>
+	<MoneyCard />
+	<section class="w-full max-w-lg px-2">
 		<slot />
-	</main>
-
-	<footer>
-		<p>visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to learn SvelteKit</p>
-	</footer>
-</div>
-
-<style>
-	.app {
-		display: flex;
-		flex-direction: column;
-		min-height: 100vh;
-	}
-
-	main {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		padding: 1rem;
-		width: 100%;
-		max-width: 64rem;
-		margin: 0 auto;
-		box-sizing: border-box;
-	}
-
-	footer {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		padding: 12px;
-	}
-
-	footer a {
-		font-weight: bold;
-	}
-
-	@media (min-width: 480px) {
-		footer {
-			padding: 12px 0;
-		}
-	}
-</style>
+	</section>
+	<nav class="w-full justify-center flex fixed bottom-4 gap-4">
+		<a href="/" class="btn btn-lg font-exo">Planet</a>
+		<a href="/build" class="btn btn-lg font-exo">Ships</a>
+	</nav>
+</main>
